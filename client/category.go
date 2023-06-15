@@ -137,7 +137,7 @@ func (c *categoryClient) DeleteCategory(token, id string) (respCode int, err err
 		return -1, err
 	}
 
-	req, err := http.NewRequest("DELETE", config.SetUrl("/api/v1/Category/delete/"+id), nil)
+	req, err := http.NewRequest("DELETE", config.SetUrl("/api/v1/category/delete/"+id), nil)
 	if err != nil {
 		return -1, err
 	}

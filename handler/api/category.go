@@ -38,7 +38,7 @@ func (ct *categoryAPI) AddCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.SuccessResponse{Message: "add category success"})
+	c.JSON(http.StatusCreated, model.SuccessResponse{Message: "add category success"})
 }
 
 func (ct *categoryAPI) UpdateCategory(c *gin.Context) {
@@ -60,7 +60,7 @@ func (ct *categoryAPI) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.NewSuccessResponse("category update success"))
+	c.JSON(http.StatusCreated, model.NewSuccessResponse("category update success"))
 }
 
 func (ct *categoryAPI) DeleteCategory(c *gin.Context) {
@@ -76,7 +76,7 @@ func (ct *categoryAPI) DeleteCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.NewSuccessResponse("category delete success"))
+	c.JSON(http.StatusCreated, model.NewSuccessResponse("category delete success"))
 }
 
 func (ct *categoryAPI) GetCategoryByID(c *gin.Context) {

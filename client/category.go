@@ -89,8 +89,8 @@ func (c *categoryClient) AddCategory(token, name string) (respCode int, err erro
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return -1, errors.New("status code not 200")
+	if resp.StatusCode != 201 {
+		return -1, errors.New("status code not 201")
 	}
 
 	return resp.StatusCode, nil
@@ -124,8 +124,8 @@ func (c *categoryClient) UpdateCategory(token, id, name string) (respCode int, e
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return -1, errors.New("status code not 200")
+	if resp.StatusCode != 201 {
+		return -1, errors.New("status code not 201")
 	}
 
 	return resp.StatusCode, nil
@@ -150,8 +150,8 @@ func (c *categoryClient) DeleteCategory(token, id string) (respCode int, err err
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return -1, errors.New("status code not 200")
+	if resp.StatusCode != 201 {
+		return -1, errors.New("status code not 201")
 	}
 
 	return resp.StatusCode, nil

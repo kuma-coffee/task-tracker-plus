@@ -95,8 +95,8 @@ func (t *taskClient) AddTask(token string, task model.Task) (respCode int, err e
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return -1, errors.New("status code not 200")
+	if resp.StatusCode != 201 {
+		return -1, errors.New("status code not 201")
 	}
 
 	return resp.StatusCode, nil
@@ -135,8 +135,8 @@ func (t *taskClient) UpdateTask(token string, task model.Task) (respCode int, er
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return -1, errors.New("status code not 200")
+	if resp.StatusCode != 201 {
+		return -1, errors.New("status code not 201")
 	}
 
 	return resp.StatusCode, nil
@@ -161,8 +161,8 @@ func (t *taskClient) DeleteTask(token string, id int) (respCode int, err error) 
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return -1, errors.New("status code not 200")
+	if resp.StatusCode != 201 {
+		return -1, errors.New("status code not 201")
 	}
 
 	return resp.StatusCode, nil

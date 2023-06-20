@@ -39,7 +39,7 @@ func (t *taskAPI) AddTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.SuccessResponse{Message: "add task success"})
+	c.JSON(http.StatusCreated, model.SuccessResponse{Message: "add task success"})
 }
 
 func (t *taskAPI) UpdateTask(c *gin.Context) {
@@ -61,7 +61,7 @@ func (t *taskAPI) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.NewSuccessResponse("update task success"))
+	c.JSON(http.StatusCreated, model.NewSuccessResponse("update task success"))
 }
 
 func (t *taskAPI) DeleteTask(c *gin.Context) {
@@ -77,7 +77,7 @@ func (t *taskAPI) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.NewSuccessResponse("delete task success"))
+	c.JSON(http.StatusCreated, model.NewSuccessResponse("delete task success"))
 }
 
 func (t *taskAPI) GetTaskByID(c *gin.Context) {

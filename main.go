@@ -12,7 +12,6 @@ import (
 	"embed"
 	"fmt"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
@@ -60,22 +59,27 @@ func main() {
 		}))
 		router.Use(gin.Recovery())
 
-		// dbCredential := model.Credential{
-		// 	Host:         "localhost",
-		// 	Username:     "postgres",
-		// 	Password:     "postgres",
-		// 	DatabaseName: "kampusmerdeka",
-		// 	Port:         5432,
-		// 	Schema:       "public",
-		// }
+		dbCredential := model.Credential{
+			Host:         "localhost",
+			Username:     "postgres",
+			Password:     "postgres",
+			DatabaseName: "kampusmerdeka",
+			Port:         5432,
+			Schema:       "public",
+		}
 
-		// os.Setenv("DATABASE_URL", "postgres://postgres:hiwOus48NkMMSSE@localhost:15432/postgres") // <- Gunakan ini untuk connect database di localhost
-		os.Setenv("DATABASE_URL", "postgresql://postgres:GjINkJgFQyTXVmafwze4@containers-us-west-10.railway.app:6752/railway")
-
-		conn, err := db.Connect()
+		conn, err := db.Connect(&dbCredential)
 		if err != nil {
 			panic(err)
 		}
+
+		// os.Setenv("DATABASE_URL", "postgres://postgres:hiwOus48NkMMSSE@localhost:15432/postgres") // <- Gunakan ini untuk connect database di localhost
+		// os.Setenv("DATABASE_URL", "postgresql://postgres:GjINkJgFQyTXVmafwze4@containers-us-west-10.railway.app:6752/railway")
+
+		// conn, err := db.Connect()
+		// if err != nil {
+		// 	panic(err)
+		// }
 
 		conn.AutoMigrate(&model.User{}, &model.Session{}, &model.Category{}, &model.Task{})
 
@@ -190,6 +194,7 @@ func RunClient(db *gorm.DB, gin *gin.Engine, embed embed.FS) *gin.Engine {
 		main.GET("/task", client.TaskWeb.TaskPage)
 		user.POST("/task/add/process", client.TaskWeb.TaskAddProcess)
 		main.GET("/category", client.CategoryWeb.Category)
+		user.POST("/category/add/process", client.CategoryWeb.CategoryAddProcess)
 	}
 
 	modal := gin.Group("/client")

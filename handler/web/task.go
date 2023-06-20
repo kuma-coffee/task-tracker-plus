@@ -107,7 +107,7 @@ func (t *taskWeb) TaskAddProcess(c *gin.Context) {
 	}
 
 	if status == 201 {
-		c.Redirect(http.StatusSeeOther, "/client/login")
+		c.Redirect(http.StatusSeeOther, "/client/task")
 	} else {
 		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Task Failed!")
 	}

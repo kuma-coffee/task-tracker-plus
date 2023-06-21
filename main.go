@@ -12,6 +12,7 @@ import (
 	"embed"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -59,27 +60,27 @@ func main() {
 		}))
 		router.Use(gin.Recovery())
 
-		dbCredential := model.Credential{
-			Host:         "localhost",
-			Username:     "postgres",
-			Password:     "postgres",
-			DatabaseName: "kampusmerdeka",
-			Port:         5432,
-			Schema:       "public",
-		}
+		// dbCredential := model.Credential{
+		// 	Host:         "localhost",
+		// 	Username:     "postgres",
+		// 	Password:     "postgres",
+		// 	DatabaseName: "kampusmerdeka",
+		// 	Port:         5432,
+		// 	Schema:       "public",
+		// }
 
-		conn, err := db.Connect(&dbCredential)
-		if err != nil {
-			panic(err)
-		}
-
-		// os.Setenv("DATABASE_URL", "postgres://postgres:hiwOus48NkMMSSE@localhost:15432/postgres") // <- Gunakan ini untuk connect database di localhost
-		// os.Setenv("DATABASE_URL", "postgresql://postgres:GjINkJgFQyTXVmafwze4@containers-us-west-10.railway.app:6752/railway")
-
-		// conn, err := db.Connect()
+		// conn, err := db.Connect(&dbCredential)
 		// if err != nil {
 		// 	panic(err)
 		// }
+
+		// os.Setenv("DATABASE_URL", "postgres://postgres:hiwOus48NkMMSSE@localhost:15432/postgres") // <- Gunakan ini untuk connect database di localhost
+		os.Setenv("DATABASE_URL", "postgresql://postgres:GjINkJgFQyTXVmafwze4@containers-us-west-10.railway.app:6752/railway")
+
+		conn, err := db.Connect()
+		if err != nil {
+			panic(err)
+		}
 
 		conn.AutoMigrate(&model.User{}, &model.Session{}, &model.Category{}, &model.Task{})
 
@@ -165,7 +166,7 @@ func RunClient(db *gorm.DB, gin *gin.Engine, embed embed.FS) *gin.Engine {
 	modalWeb := web.NewModalWeb(embed)
 	homeWeb := web.NewHomeWeb(embed)
 	dashboardWeb := web.NewDashboardWeb(userClient, sessionService, embed)
-	taskWeb := web.NewTaskWeb(taskClient, sessionService, embed)
+	taskWeb := web.NewTaskWeb(taskClient, categoryClient, sessionService, embed)
 	categoryWeb := web.NewCategoryWeb(categoryClient, sessionService, embed)
 
 	client := ClientHandler{
@@ -196,6 +197,7 @@ func RunClient(db *gorm.DB, gin *gin.Engine, embed embed.FS) *gin.Engine {
 		main.GET("/task/update/:id", client.TaskWeb.TaskUpdatePage)
 		main.POST("/task/update/process", client.TaskWeb.TaskUpdateProcess)
 		main.POST("/task/delete/process/:id", client.TaskWeb.TaskDeleteProcess)
+		main.GET("/task/category/:id", client.TaskWeb.TaskByCategory)
 		main.GET("/category", client.CategoryWeb.Category)
 		main.POST("/category/add/process", client.CategoryWeb.CategoryAddProcess)
 		main.GET("/category/update/:id", client.CategoryWeb.CategoryUpdatePage)

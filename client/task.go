@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -18,6 +17,7 @@ type TaskClient interface {
 	AddTask(token string, task model.Task) (respCode int, err error)
 	UpdateTask(token string, task model.Task) (respCode int, err error)
 	DeleteTask(token string, id int) (respCode int, err error)
+	TaskByCategory(id string, token string) ([]*model.TaskCategory, error)
 }
 
 type taskClient struct {
@@ -160,7 +160,7 @@ func (t *taskClient) UpdateTask(token string, task model.Task) (respCode int, er
 	if err != nil {
 		return -1, err
 	}
-	fmt.Println(task.ID)
+
 	req, err := http.NewRequest("PUT", config.SetUrl("/api/v1/task/update/"+strconv.Itoa(task.ID)), bytes.NewBuffer(data))
 	if err != nil {
 		return -1, err
@@ -205,4 +205,41 @@ func (t *taskClient) DeleteTask(token string, id int) (respCode int, err error) 
 	}
 
 	return resp.StatusCode, nil
+}
+
+func (t *taskClient) TaskByCategory(id, token string) ([]*model.TaskCategory, error) {
+	client, err := GetClientWithCookie(token)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", config.SetUrl("/api/v1/task/category/"+id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("status code not 200")
+	}
+
+	var tasks []*model.TaskCategory
+	err = json.Unmarshal(b, &tasks)
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
 }

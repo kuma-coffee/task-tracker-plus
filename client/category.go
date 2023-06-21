@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -126,7 +127,7 @@ func (c *categoryClient) AddCategory(token, name string) (respCode int, err erro
 	}
 
 	defer resp.Body.Close()
-
+	fmt.Println(resp.StatusCode)
 	if resp.StatusCode != 201 {
 		return -1, errors.New("status code not 201")
 	}

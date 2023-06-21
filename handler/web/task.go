@@ -19,16 +19,18 @@ type TaskWeb interface {
 	TaskUpdatePage(c *gin.Context)
 	TaskUpdateProcess(c *gin.Context)
 	TaskDeleteProcess(c *gin.Context)
+	TaskByCategory(c *gin.Context)
 }
 
 type taskWeb struct {
 	taskClient     client.TaskClient
+	categoryClient client.CategoryClient
 	sessionService service.SessionService
 	embed          embed.FS
 }
 
-func NewTaskWeb(taskClient client.TaskClient, sessionService service.SessionService, embed embed.FS) *taskWeb {
-	return &taskWeb{taskClient, sessionService, embed}
+func NewTaskWeb(taskClient client.TaskClient, categoryClient client.CategoryClient, sessionService service.SessionService, embed embed.FS) *taskWeb {
+	return &taskWeb{taskClient, categoryClient, sessionService, embed}
 }
 
 func (t *taskWeb) TaskPage(c *gin.Context) {
@@ -51,9 +53,16 @@ func (t *taskWeb) TaskPage(c *gin.Context) {
 		return
 	}
 
+	categories, err := t.categoryClient.CategoryList(session.Token)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
 	var dataTemplate = map[string]interface{}{
-		"email": email,
-		"tasks": tasks,
+		"email":      email,
+		"tasks":      tasks,
+		"categories": categories,
 	}
 
 	var funcMap = template.FuncMap{
@@ -231,5 +240,60 @@ func (t *taskWeb) TaskDeleteProcess(c *gin.Context) {
 		c.Redirect(http.StatusSeeOther, "/client/task")
 	} else {
 		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Task Failed!")
+	}
+}
+
+func (t *taskWeb) TaskByCategory(c *gin.Context) {
+	var email string
+	if temp, ok := c.Get("email"); ok {
+		if contextData, ok := temp.(string); ok {
+			email = contextData
+		}
+	}
+
+	session, err := t.sessionService.GetSessionByEmail(email)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	taskID := c.Param("id")
+
+	tasks, err := t.taskClient.TaskByCategory(taskID, session.Token)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	categories, err := t.categoryClient.CategoryList(session.Token)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	var dataTemplate = map[string]interface{}{
+		"email":      email,
+		"tasks":      tasks,
+		"categories": categories,
+	}
+
+	var funcMap = template.FuncMap{
+		"exampleFunc": func() int {
+			return 0
+		},
+	}
+
+	var header = path.Join("views", "general", "header.html")
+	var filepath = path.Join("views", "main", "task_category.html")
+
+	temp, err := template.New("task_category.html").Funcs(funcMap).ParseFS(t.embed, filepath, header)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	err = temp.Execute(c.Writer, dataTemplate)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
 	}
 }

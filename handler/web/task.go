@@ -5,6 +5,7 @@ import (
 	"a21hc3NpZ25tZW50/model"
 	"a21hc3NpZ25tZW50/service"
 	"embed"
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
@@ -16,6 +17,8 @@ import (
 type TaskWeb interface {
 	TaskPage(c *gin.Context)
 	TaskAddProcess(c *gin.Context)
+	TaskUpdatePage(c *gin.Context)
+	TaskUpdateProcess(c *gin.Context)
 }
 
 type taskWeb struct {
@@ -101,6 +104,95 @@ func (t *taskWeb) TaskAddProcess(c *gin.Context) {
 	}
 
 	status, err := t.taskClient.AddTask(session.Token, task)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	if status == 201 {
+		c.Redirect(http.StatusSeeOther, "/client/task")
+	} else {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Task Failed!")
+	}
+}
+
+func (t *taskWeb) TaskUpdatePage(c *gin.Context) {
+	var email string
+	if temp, ok := c.Get("email"); ok {
+		if contextData, ok := temp.(string); ok {
+			email = contextData
+		}
+	}
+
+	session, err := t.sessionService.GetSessionByEmail(email)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	taskID := c.Param("id")
+
+	task, err := t.taskClient.TaskByID(taskID, session.Token)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	var dataTemplate = map[string]interface{}{
+		"email": email,
+		"task":  task,
+	}
+
+	var funcMap = template.FuncMap{
+		"exampleFunc": func() int {
+			return 0
+		},
+	}
+
+	var header = path.Join("views", "general", "header.html")
+	var filepath = path.Join("views", "main", "task_update.html")
+
+	temp, err := template.New("task_update.html").Funcs(funcMap).ParseFS(t.embed, filepath, header)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	err = temp.Execute(c.Writer, dataTemplate)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+	}
+}
+
+func (t *taskWeb) TaskUpdateProcess(c *gin.Context) {
+	var email string
+	if temp, ok := c.Get("email"); ok {
+		if contextData, ok := temp.(string); ok {
+			email = contextData
+		}
+	}
+
+	session, err := t.sessionService.GetSessionByEmail(email)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+	id, _ := strconv.Atoi(c.Request.FormValue("id"))
+	priority, _ := strconv.Atoi(c.Request.FormValue("priority"))
+	categoryID, _ := strconv.Atoi(c.Request.FormValue("category_id"))
+	userID, _ := strconv.Atoi(c.Request.FormValue("user_id"))
+	task := model.Task{
+		ID:         id,
+		Title:      c.Request.FormValue("title"),
+		Deadline:   c.Request.FormValue("deadline"),
+		Priority:   priority,
+		Status:     c.Request.FormValue("status"),
+		CategoryID: categoryID,
+		UserID:     userID,
+	}
+	fmt.Println(id)
+
+	status, err := t.taskClient.UpdateTask(session.Token, task)
 	if err != nil {
 		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
 		return

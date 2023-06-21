@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 
 type TaskClient interface {
 	TaskList(token string) ([]*model.Task, error)
+	TaskByID(id string, token string) (*model.Task, error)
 	AddTask(token string, task model.Task) (respCode int, err error)
 	UpdateTask(token string, task model.Task) (respCode int, err error)
 	DeleteTask(token string, id int) (respCode int, err error)
@@ -60,6 +62,43 @@ func (t *taskClient) TaskList(token string) ([]*model.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (t *taskClient) TaskByID(id string, token string) (*model.Task, error) {
+	client, err := GetClientWithCookie(token)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", config.SetUrl("/api/v1/task/get/"+id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("0")
+	}
+
+	var task *model.Task
+	err = json.Unmarshal(b, &task)
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
 }
 
 func (t *taskClient) AddTask(token string, task model.Task) (respCode int, err error) {
@@ -121,7 +160,7 @@ func (t *taskClient) UpdateTask(token string, task model.Task) (respCode int, er
 	if err != nil {
 		return -1, err
 	}
-
+	fmt.Println(task.ID)
 	req, err := http.NewRequest("PUT", config.SetUrl("/api/v1/task/update/"+strconv.Itoa(task.ID)), bytes.NewBuffer(data))
 	if err != nil {
 		return -1, err

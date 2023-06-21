@@ -200,7 +200,7 @@ func RunClient(db *gorm.DB, gin *gin.Engine, embed embed.FS) *gin.Engine {
 		main.POST("/category/add/process", client.CategoryWeb.CategoryAddProcess)
 		main.GET("/category/update/:id", client.CategoryWeb.CategoryUpdatePage)
 		main.POST("/category/update/process", client.CategoryWeb.CategoryUpdateProcess)
-		main.POST("/category/delete/process/:id", client.TaskWeb.TaskDeleteProcess)
+		main.POST("/category/delete/process/:id", client.CategoryWeb.CategoryDeleteProcess)
 	}
 
 	modal := gin.Group("/client")

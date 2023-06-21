@@ -17,7 +17,7 @@ type CategoryWeb interface {
 	CategoryAddProcess(c *gin.Context)
 	CategoryUpdatePage(c *gin.Context)
 	CategoryUpdateProcess(c *gin.Context)
-	// CategoryDeleteProcess(c *gin.Context)
+	CategoryDeleteProcess(c *gin.Context)
 }
 
 type categoryWeb struct {
@@ -171,6 +171,35 @@ func (c *categoryWeb) CategoryUpdateProcess(ctx *gin.Context) {
 	name := ctx.Request.FormValue("name")
 
 	status, err := c.categoryClient.UpdateCategory(session.Token, id, name)
+	if err != nil {
+		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	if status == 201 {
+		ctx.Redirect(http.StatusSeeOther, "/client/category")
+	} else {
+		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Category Failed!")
+	}
+}
+
+func (c *categoryWeb) CategoryDeleteProcess(ctx *gin.Context) {
+	var email string
+	if temp, ok := ctx.Get("email"); ok {
+		if contextData, ok := temp.(string); ok {
+			email = contextData
+		}
+	}
+
+	session, err := c.sessionService.GetSessionByEmail(email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, model.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	categoryID := ctx.Param("id")
+
+	status, err := c.categoryClient.DeleteCategory(session.Token, categoryID)
 	if err != nil {
 		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
 		return

@@ -5,7 +5,6 @@ import (
 	"a21hc3NpZ25tZW50/model"
 	"a21hc3NpZ25tZW50/service"
 	"embed"
-	"fmt"
 	"net/http"
 	"path"
 	"strconv"
@@ -178,6 +177,7 @@ func (t *taskWeb) TaskUpdateProcess(c *gin.Context) {
 		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
 		return
 	}
+
 	id, _ := strconv.Atoi(c.Request.FormValue("id"))
 	priority, _ := strconv.Atoi(c.Request.FormValue("priority"))
 	categoryID, _ := strconv.Atoi(c.Request.FormValue("category_id"))
@@ -191,7 +191,6 @@ func (t *taskWeb) TaskUpdateProcess(c *gin.Context) {
 		CategoryID: categoryID,
 		UserID:     userID,
 	}
-	fmt.Println(id)
 
 	status, err := t.taskClient.UpdateTask(session.Token, task)
 	if err != nil {

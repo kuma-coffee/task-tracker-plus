@@ -19,6 +19,7 @@ type TaskWeb interface {
 	TaskAddProcess(c *gin.Context)
 	TaskUpdatePage(c *gin.Context)
 	TaskUpdateProcess(c *gin.Context)
+	TaskDeleteProcess(c *gin.Context)
 }
 
 type taskWeb struct {
@@ -193,6 +194,35 @@ func (t *taskWeb) TaskUpdateProcess(c *gin.Context) {
 	fmt.Println(id)
 
 	status, err := t.taskClient.UpdateTask(session.Token, task)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	if status == 201 {
+		c.Redirect(http.StatusSeeOther, "/client/task")
+	} else {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Task Failed!")
+	}
+}
+
+func (t *taskWeb) TaskDeleteProcess(c *gin.Context) {
+	var email string
+	if temp, ok := c.Get("email"); ok {
+		if contextData, ok := temp.(string); ok {
+			email = contextData
+		}
+	}
+
+	session, err := t.sessionService.GetSessionByEmail(email)
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
+		return
+	}
+
+	taskID, _ := strconv.Atoi(c.Param("id"))
+
+	status, err := t.taskClient.DeleteTask(session.Token, taskID)
 	if err != nil {
 		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message="+err.Error())
 		return

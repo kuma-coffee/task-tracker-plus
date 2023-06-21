@@ -411,13 +411,28 @@
                             >Edit</a
                           >
                         </div>
-                        <div class="mx-1">
+                        <form
+                          action="task/delete/process/{{$val.ID}}"
+                          method="post"
+                          class="mx-1"
+                        >
+                          <div>
+                            <button
+                              type="submit"
+                              class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </form>
+
+                        <!-- <div class="mx-1">
                           <a
-                            href="task/delete"
+                            href="task/delete/process/{{$val.ID}}"
                             class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >Delete</a
                           >
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                   </div>

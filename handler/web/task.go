@@ -210,7 +210,7 @@ func (t *taskWeb) TaskUpdateProcess(c *gin.Context) {
 	if status == 201 {
 		c.Redirect(http.StatusSeeOther, "/client/task")
 	} else {
-		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Task Failed!")
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Update Task Failed!")
 	}
 }
 
@@ -239,7 +239,7 @@ func (t *taskWeb) TaskDeleteProcess(c *gin.Context) {
 	if status == 201 {
 		c.Redirect(http.StatusSeeOther, "/client/task")
 	} else {
-		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Task Failed!")
+		c.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Delete Task Failed!")
 	}
 }
 

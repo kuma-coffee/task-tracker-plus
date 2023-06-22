@@ -179,7 +179,7 @@ func (c *categoryWeb) CategoryUpdateProcess(ctx *gin.Context) {
 	if status == 201 {
 		ctx.Redirect(http.StatusSeeOther, "/client/category")
 	} else {
-		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Category Failed!")
+		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Update Category Failed!")
 	}
 }
 
@@ -208,6 +208,6 @@ func (c *categoryWeb) CategoryDeleteProcess(ctx *gin.Context) {
 	if status == 201 {
 		ctx.Redirect(http.StatusSeeOther, "/client/category")
 	} else {
-		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Add Category Failed!")
+		ctx.Redirect(http.StatusSeeOther, "/client/modal?status=error&message=Delete Category Failed!")
 	}
 }

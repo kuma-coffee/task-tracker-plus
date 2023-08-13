@@ -75,7 +75,7 @@ func main() {
 		// }
 
 		// os.Setenv("DATABASE_URL", "postgres://postgres:hiwOus48NkMMSSE@localhost:15432/postgres") // <- Gunakan ini untuk connect database di localhost
-		os.Setenv("DATABASE_URL", "postgresql://postgres:GjINkJgFQyTXVmafwze4@containers-us-west-10.railway.app:6752/railway")
+		os.Getenv("DATABASE_URL")
 
 		conn, err := db.Connect()
 		if err != nil {
